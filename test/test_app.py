@@ -47,22 +47,23 @@ def load_table(data_table):
     client = boto3.resource("dynamodb")
     table = client.Table(app.ENV_TABLE_NAME)
     body = {
+        'diagnose_id': '11111',
+        'doctor_id': "test-dr",
+        'diagnose': "test",
+        'doctor_name': 'dr.test',
+        'creation_date': '03/03/2023',
         'case_id': '123',
-        'injury_type': 'test_inj',
-        'shape': 'shape-test',
-        'number_of_lessions': 'lesson_test',
-        'distributions': 'test',
-        'color': 'test-red',
         'patient_id': '123'
     }
     table.put_item(Item=body)
 def test_givenValidInputRequestThenReturn200AndValidArray(lambda_environment, load_table):
     event = {
-        "resource": "/patient/{patient_id}/case/{case_id}",
-        "path": "/patient/123/case/123",
+        "resource": "/doctor/{patient_id}/diagnose/{case_id}",
+        "path": "/doctor/123/diagnose/123",
         "httpMethod": "GET",
         "pathParameters": {
-            "patient_id": "123"
+            "patient_id": "123",
+            "case_id": "123"
         },
         "isBase64Encoded": False
     }
@@ -76,11 +77,12 @@ def test_givenValidInputRequestThenReturn200AndValidArray(lambda_environment, lo
 
 def test_givenValidInputRequestThenReturn200AndEmptyArray(lambda_environment, load_table):
     event = {
-        "resource": "/patient/{patient_id}/case/{case_id}",
-        "path": "/patient/123/case/123",
+        "resource": "/doctor/{patient_id}/diagnose/{case_id}",
+        "path": "/doctor/123/diagnose/123",
         "httpMethod": "GET",
         "pathParameters": {
-            "patient_id": "1234"
+            "patient_id": "123",
+            "case_id": "1234"
         },
         "isBase64Encoded": False
     }
@@ -93,10 +95,11 @@ def test_givenValidInputRequestThenReturn200AndEmptyArray(lambda_environment, lo
 
 def test_givenMissingQueryParamsOnRequestThenReturnError412(lambda_environment, data_table):
     event = {
-        "resource": "/patient/{patient_id}/case/{case_id}",
-        "path": "/patient/123/case/123",
+        "resource": "/doctor/{patient_id}/diagnose/{case_id}",
+        "path": "/doctor/123/diagnose/123",
         "httpMethod": "GET",
         "pathParameters": {
+            "patient_id": "123",
         },
         "isBase64Encoded": False
     }
@@ -108,11 +111,12 @@ def test_givenMissingQueryParamsOnRequestThenReturnError412(lambda_environment, 
 
 def test_givenRequestWithErrorInDBThenReturnError500(lambda_environment):
     event = {
-        "resource": "/patient/{patient_id}/case/{case_id}",
-        "path": "/patient/123/case/123",
+        "resource": "/doctor/{patient_id}/diagnose/{case_id}",
+        "path": "/doctor/123/diagnose/123",
         "httpMethod": "GET",
         "pathParameters": {
-            "patient_id": "1234"
+            "patient_id": "123",
+            "case_id": "1234"
         },
         "isBase64Encoded": False
     }
